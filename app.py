@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-from model import preprocessing, clustering, evaluate, pca_2d
+from model import preprocessing, clustering, evaluate
 
 st.title('Clustering App')
 
@@ -44,20 +44,4 @@ scatter = ax.scatter(X[col_x], X[col_y], c=labels, cmap='viridis')
 ax.set_xlabel(col_x)
 ax.set_ylabel(col_y)
 ax.legend(*scatter.legend_elements(), title='Cluster')
-st.pyplot(fig)
-
-st.markdown('**PCA projection (all selected features)**')
-coords = pca_2d(X)
-fig, ax = plt.subplots()
-scatter = ax.scatter(coords[:, 0], coords[:, 1], c=labels, cmap='viridis')
-ax.set_xlabel('PC1')
-ax.set_ylabel('PC2')
-ax.legend(*scatter.legend_elements(), title='Cluster')
-st.pyplot(fig)
-
-st.markdown('**Cluster sizes**')
-fig, ax = plt.subplots()
-df['cluster'].value_counts().sort_index().plot(kind='bar', ax=ax)
-ax.set_xlabel('Cluster')
-ax.set_ylabel('Count')
 st.pyplot(fig)
