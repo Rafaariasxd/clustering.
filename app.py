@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-from model import preprocessing, clustering, evaluate
+from model import preprocessing, clustering, dbscan_clustering, evaluate
 
 st.title('Clustering App')
 
@@ -21,14 +21,23 @@ if len(features) < 2:
     st.warning('Select at least 2 features')
     st.stop()
 
-n_cluster = st.slider('Number of clusters',2,10,3)
-linkage = st.selectbox('Select linkage',['ward','single','complete'])
+algorithm = st.selectbox('Select clustering algorithm',['Hierarchical Clustering','DBSCAN'])
 
 X = preprocessing(df,features)
-labels = clustering(X,n_clusters=n_cluster,linkage=linkage)
+if algorithm == 'Hierarchical Clustering':
+    n_cluster = st.slider('Number of clusters',2,10,3)
+    linkage = st.selectbox('Select linkage',['ward','single','complete'])
+    labels = clustering(X,n_clusters=n_cluster,linkage=linkage)
+else:
+    eps = st.slider('eps',0.1,5.0,0.5,0.1)
+    min_samples = st.slider('min_samples',2,20,5)
+    labels = dbscan_clustering(X,eps=eps,min_samples=min_samples)
 df['cluster'] = labels
 st.subheader('Clustered Dataset')
 st.dataframe(df)
+if len(set(labels)) < 2:
+    st.warning('Only one cluster found, try other parameters')
+    st.stop()
 silhoutte, davis = evaluate(X,labels)
 st.write('Silhouette',silhoutte)
 st.write('Davis Index',davis)
